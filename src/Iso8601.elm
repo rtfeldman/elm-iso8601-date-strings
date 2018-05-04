@@ -327,7 +327,7 @@ It's generally best to avoid doing this unless an external API requires it.
 (UTC integers are less error-prone, take up less memory, and are more efficient
 for time arithmetic.)
 
-Format: YYYY-MM-DDTHH:mm:ss.sssZ
+Format: YYYY-MM-DDTHH:mm:ss.SSSZ
 
 -}
 fromTime : Time.Posix -> String
@@ -350,7 +350,7 @@ fromTime time =
         -- ss
         ++ toPaddedString 2 (Time.toSecond utc time)
         ++ ":"
-        -- sss
+        -- SSS
         ++ toPaddedString 2 (Time.toMillis utc time)
         ++ "Z"
 
