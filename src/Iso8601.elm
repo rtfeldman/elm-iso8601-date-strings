@@ -355,6 +355,7 @@ fromTime time =
         ++ "Z"
 
 
+toPaddedString : Int -> Int -> String
 toPaddedString digits time =
     String.padLeft digits '0' (String.fromInt time)
 
