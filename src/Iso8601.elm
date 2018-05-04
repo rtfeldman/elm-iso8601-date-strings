@@ -336,7 +336,7 @@ fromTime time =
     toPaddedString 4 (Time.toYear utc time)
         ++ "-"
         -- MM
-        ++ fromMonth (Time.toMonth utc time)
+        ++ toPaddedString 2 (fromMonth (Time.toMonth utc time))
         ++ "-"
         -- DD
         ++ toPaddedString 2 (Time.toDay utc time)
@@ -360,41 +360,41 @@ toPaddedString digits time =
     String.padLeft digits '0' (String.fromInt time)
 
 
-fromMonth : Time.Month -> String
+fromMonth : Time.Month -> Int
 fromMonth month =
     case month of
         Jan ->
-            "01"
+            1
 
         Feb ->
-            "02"
+            2
 
         Mar ->
-            "03"
+            3
 
         Apr ->
-            "04"
+            4
 
         May ->
-            "05"
+            5
 
         Jun ->
-            "06"
+            6
 
         Jul ->
-            "07"
+            7
 
         Aug ->
-            "08"
+            8
 
         Sep ->
-            "09"
+            9
 
         Oct ->
-            "10"
+            10
 
         Nov ->
-            "11"
+            11
 
         Dec ->
-            "12"
+            12
