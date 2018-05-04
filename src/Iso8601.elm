@@ -287,9 +287,9 @@ iso8601 =
                     [ map (\_ -> 1) (symbol "+")
                     , map (\_ -> -1) (symbol "-")
                     ]
-                |= int
+                |= paddedInt 2
                 |. symbol ":"
-                |= int
+                |= paddedInt 2
             ]
 
 
