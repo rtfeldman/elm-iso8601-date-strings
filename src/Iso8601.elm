@@ -242,8 +242,6 @@ leapYearsBetween lower higher =
     else if lower > higher then
         -- We got passed the higher one first, so swap the arguments.
         leapYearsBetween higher lower
-    else if lower < 1800 || higher > 9999 then
-        slowLeapYearsBetween 0 lower higher
     else
         let
             -- By default, it's a leap year if it's divisible by 4.
@@ -257,18 +255,6 @@ leapYearsBetween lower higher =
                       ((lower // 400) - ((higher - 1) // 400))
         in
         defaultLeapYears - nonLeapYears
-
-
-{-| Fallback for years outside the range leapYearsBetween handles (quickly).
--}
-slowLeapYearsBetween : Int -> Int -> Int -> Int
-slowLeapYearsBetween count startYear endYear =
-    if startYear >= endYear then
-        count
-    else if isLeapYear startYear then
-        slowLeapYearsBetween (count + 1) (startYear + 1) endYear
-    else
-        slowLeapYearsBetween count (startYear + 1) endYear
 
 
 {-| YYYY-MM-DDTHH:mm:ss.sssZ or ±YYYYYY-MM-DDTHH:mm:ss.sssZ
