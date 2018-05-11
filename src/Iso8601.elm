@@ -3,7 +3,7 @@ module Iso8601 exposing (fromTime, toTime)
 {-| Convert between ISO-8601 date strings and POSIX times.
 -}
 
-import Parser exposing ((|.), (|=), Count(..), Parser, int, keep, map, oneOf, succeed, symbol)
+import Parser exposing ((|.), (|=), Parser, int, map, oneOf, succeed, symbol)
 import Time exposing (Month(..), utc)
 
 
@@ -14,7 +14,7 @@ a non-UTC time as well as a UTC offset. Regardless of which format the ISO-8601
 string uses, this function normalizes it and returns a time in UTC.
 
 -}
-toTime : String -> Result Parser.Error Time.Posix
+toTime : String -> Result (List Parser.DeadEnd) Time.Posix
 toTime str =
     Parser.run iso8601 str
 
@@ -23,15 +23,26 @@ toTime str =
 -}
 paddedInt : Int -> Parser Int
 paddedInt quantity =
-    keep (Exactly quantity) Char.isDigit
+    Parser.chompWhile Char.isDigit
+        |> Parser.getChompedString
         |> Parser.andThen
             (\str ->
-                case String.toInt str of
-                    Just intVal ->
-                        Parser.succeed intVal
+                if String.length str == quantity then
+                    -- StringtoInt works on zero-padded integers
+                    case String.toInt str of
+                        Just intVal ->
+                            Parser.succeed intVal
 
-                    Nothing ->
-                        Parser.fail ("Invalid integer: \"" ++ str ++ "\"")
+                        Nothing ->
+                            Parser.problem ("Invalid integer: \"" ++ str ++ "\"")
+
+                else
+                    Parser.problem
+                        ("Expected "
+                            ++ String.fromInt quantity
+                            ++ " digits, but got "
+                            ++ String.fromInt (String.length str)
+                        )
             )
 
 
@@ -54,7 +65,7 @@ day in a month, and neither is 32.
 -}
 invalidDay : Int -> Parser Int
 invalidDay day =
-    Parser.fail ("Invalid day: " ++ String.fromInt day)
+    Parser.problem ("Invalid day: " ++ String.fromInt day)
 
 
 epochYear : Int
@@ -66,6 +77,7 @@ yearMonthDay : ( Int, Int, Int ) -> Parser Int
 yearMonthDay ( year, month, dayInMonth ) =
     if dayInMonth < 0 then
         invalidDay dayInMonth
+
     else
         let
             succeedWith extraMs =
@@ -79,6 +91,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                             -- Also, this doesn't matter if we explicitly aren't
                             -- in a leap year.
                             dayInMonth - 1
+
                         else
                             -- We're in a leap year in March-December, so add an extra
                             -- day (for Feb 29) compared to what we'd usually do.
@@ -98,6 +111,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in January
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- Add 0 days when in the first month of the year
                     succeedWith 0
@@ -106,6 +120,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 28 days in February unless it's a leap year; then 29)
                 if (dayInMonth > 29) || (dayInMonth == 29 && not (isLeapYear year)) then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in January
                     -- (31 * 24 * 60 * 60 * 1000)
@@ -115,6 +130,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in March
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 28 days in February (leap years are handled elsewhere)
                     -- ((28 + 31) * 24 * 60 * 60 * 1000)
@@ -124,6 +140,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 30 days in April
                 if dayInMonth > 30 then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in March
                     -- ((31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -133,6 +150,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in May
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 30 days in April
                     -- ((30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -142,6 +160,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 30 days in June
                 if dayInMonth > 30 then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in May
                     -- ((31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -151,6 +170,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in July
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 30 days in June
                     -- ((30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -160,6 +180,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in August
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in July
                     -- ((31 + 30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -169,6 +190,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 30 days in September
                 if dayInMonth > 30 then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in August
                     -- ((31 + 31 + 30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -178,6 +200,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in October
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 30 days in September
                     -- ((30 + 31 + 31 + 30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -187,6 +210,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 30 days in November
                 if dayInMonth > 30 then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in October
                     -- ((31 + 30 + 31 + 31 + 30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -196,13 +220,14 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in December
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 30 days in November
                     -- ((30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
                     succeedWith 28857600000
 
             _ ->
-                Parser.fail ("Invalid month: \"" ++ String.fromInt month ++ "\"")
+                Parser.problem ("Invalid month: \"" ++ String.fromInt month ++ "\"")
 
 
 fromParts : Int -> Int -> Int -> Int -> Int -> Int -> Time.Posix
@@ -239,9 +264,11 @@ leapYearsBetween : Int -> Int -> Int
 leapYearsBetween lower higher =
     if lower == higher then
         0
+
     else if lower > higher then
         -- We got passed the higher one first, so swap the arguments.
         leapYearsBetween higher lower
+
     else
         let
             -- By default, it's a leap year if it's divisible by 4.
@@ -297,7 +324,7 @@ iso8601 =
 
 We need all three pieces information at once to do this conversion, because of
 leap years. Without knowing Month, Year, and Day, we can't tell whether to
-succeed or fail when we encounter February 29.
+succeed or problem when we encounter February 29.
 
 -}
 monthYearDayInMs : Parser Int
