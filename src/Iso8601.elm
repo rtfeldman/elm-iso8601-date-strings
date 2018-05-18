@@ -3,7 +3,7 @@ module Iso8601 exposing (fromTime, toTime)
 {-| Convert between ISO-8601 date strings and POSIX times.
 -}
 
-import Parser exposing ((|.), (|=), Count(..), Parser, int, keep, map, oneOf, succeed, symbol)
+import Parser exposing ((|.), (|=), Parser, int, map, oneOf, succeed, symbol)
 import Time exposing (Month(..), utc)
 
 
@@ -14,7 +14,7 @@ a non-UTC time as well as a UTC offset. Regardless of which format the ISO-8601
 string uses, this function normalizes it and returns a time in UTC.
 
 -}
-toTime : String -> Result Parser.Error Time.Posix
+toTime : String -> Result (List Parser.DeadEnd) Time.Posix
 toTime str =
     Parser.run iso8601 str
 
@@ -23,15 +23,25 @@ toTime str =
 -}
 paddedInt : Int -> Parser Int
 paddedInt quantity =
-    keep (Exactly quantity) Char.isDigit
+    Parser.chompWhile Char.isDigit
+        |> Parser.getChompedString
         |> Parser.andThen
             (\str ->
-                case String.toInt str of
-                    Just intVal ->
-                        Parser.succeed intVal
+                if String.length str == quantity then
+                    -- StringtoInt works on zero-padded integers
+                    case String.toInt str of
+                        Just intVal ->
+                            Parser.succeed intVal
 
-                    Nothing ->
-                        Parser.fail ("Invalid integer: \"" ++ str ++ "\"")
+                        Nothing ->
+                            Parser.problem ("Invalid integer: \"" ++ str ++ "\"")
+                else
+                    Parser.problem
+                        ("Expected "
+                            ++ String.fromInt quantity
+                            ++ " digits, but got "
+                            ++ String.fromInt (String.length str)
+                        )
             )
 
 
@@ -54,7 +64,7 @@ day in a month, and neither is 32.
 -}
 invalidDay : Int -> Parser Int
 invalidDay day =
-    Parser.fail ("Invalid day: " ++ String.fromInt day)
+    Parser.problem ("Invalid day: " ++ String.fromInt day)
 
 
 epochYear : Int
@@ -202,7 +212,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                     succeedWith 28857600000
 
             _ ->
-                Parser.fail ("Invalid month: \"" ++ String.fromInt month ++ "\"")
+                Parser.problem ("Invalid month: \"" ++ String.fromInt month ++ "\"")
 
 
 fromParts : Int -> Int -> Int -> Int -> Int -> Int -> Time.Posix
@@ -297,7 +307,7 @@ iso8601 =
 
 We need all three pieces information at once to do this conversion, because of
 leap years. Without knowing Month, Year, and Day, we can't tell whether to
-succeed or fail when we encounter February 29.
+succeed or problem when we encounter February 29.
 
 -}
 monthYearDayInMs : Parser Int
