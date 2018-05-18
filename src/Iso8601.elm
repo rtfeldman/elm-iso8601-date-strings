@@ -102,7 +102,7 @@ yearMonthDay ( year, month, dayInMonth ) =
 
                     dayMs =
                         -- one extra day for each leap year
-                        msPerDay * (days + leapYearsBetween epochYear year)
+                        msPerDay * (days + (leapYearsBefore year - leapYearsBefore epochYear))
 
                     yearMs =
                         msPerYear * (year - epochYear)
@@ -261,30 +261,13 @@ isLeapYear year =
     (modBy 4 year == 0) && ((modBy 100 year /= 0) || (modBy 400 year == 0))
 
 
-{-| Based on <https://stackoverflow.com/a/14883770/2334666>
--}
-leapYearsBetween : Int -> Int -> Int
-leapYearsBetween lower higher =
-    if lower == higher then
-        0
-
-    else if lower > higher then
-        -- We got passed the higher one first, so swap the arguments.
-        leapYearsBetween higher lower
-
-    else
-        let
-            -- By default, it's a leap year if it's divisible by 4.
-            defaultLeapYears =
-                (lower // 4) - ((higher - 1) // 4)
-
-            nonLeapYears =
-                -- It's not a leap year if it's divisible by 100
-                ((lower // 100) - ((higher - 1) // 100))
-                    - -- It *is* a leap year if it's divisible by 400
-                      ((lower // 400) - ((higher - 1) // 400))
-        in
-        defaultLeapYears - nonLeapYears
+leapYearsBefore : Int -> Int
+leapYearsBefore y1 =
+    let
+        y =
+            y1 - 1
+    in
+    (y // 4) - (y // 100) + (y // 400)
 
 
 {-| YYYY-MM-DDTHH:mm:ss.sssZ or ±YYYYYY-MM-DDTHH:mm:ss.sssZ
