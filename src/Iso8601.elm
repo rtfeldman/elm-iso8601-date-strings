@@ -1,6 +1,9 @@
 module Iso8601 exposing (fromTime, toTime)
 
 {-| Convert between ISO-8601 date strings and POSIX times.
+
+@docs fromTime, toTime
+
 -}
 
 import Parser exposing ((|.), (|=), Parser, int, map, oneOf, succeed, symbol)
