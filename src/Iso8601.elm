@@ -35,6 +35,7 @@ paddedInt quantity =
 
                         Nothing ->
                             Parser.problem ("Invalid integer: \"" ++ str ++ "\"")
+
                 else
                     Parser.problem
                         ("Expected "
@@ -76,6 +77,7 @@ yearMonthDay : ( Int, Int, Int ) -> Parser Int
 yearMonthDay ( year, month, dayInMonth ) =
     if dayInMonth < 0 then
         invalidDay dayInMonth
+
     else
         let
             succeedWith extraMs =
@@ -89,6 +91,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                             -- Also, this doesn't matter if we explicitly aren't
                             -- in a leap year.
                             dayInMonth - 1
+
                         else
                             -- We're in a leap year in March-December, so add an extra
                             -- day (for Feb 29) compared to what we'd usually do.
@@ -108,6 +111,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in January
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- Add 0 days when in the first month of the year
                     succeedWith 0
@@ -116,6 +120,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 28 days in February unless it's a leap year; then 29)
                 if (dayInMonth > 29) || (dayInMonth == 29 && not (isLeapYear year)) then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in January
                     -- (31 * 24 * 60 * 60 * 1000)
@@ -125,6 +130,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in March
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 28 days in February (leap years are handled elsewhere)
                     -- ((28 + 31) * 24 * 60 * 60 * 1000)
@@ -134,6 +140,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 30 days in April
                 if dayInMonth > 30 then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in March
                     -- ((31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -143,6 +150,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in May
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 30 days in April
                     -- ((30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -152,6 +160,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 30 days in June
                 if dayInMonth > 30 then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in May
                     -- ((31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -161,6 +170,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in July
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 30 days in June
                     -- ((30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -170,6 +180,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in August
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in July
                     -- ((31 + 30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -179,6 +190,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 30 days in September
                 if dayInMonth > 30 then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in August
                     -- ((31 + 31 + 30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -188,6 +200,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in October
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 30 days in September
                     -- ((30 + 31 + 31 + 30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -197,6 +210,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 30 days in November
                 if dayInMonth > 30 then
                     invalidDay dayInMonth
+
                 else
                     -- 31 days in October
                     -- ((31 + 30 + 31 + 31 + 30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
@@ -206,6 +220,7 @@ yearMonthDay ( year, month, dayInMonth ) =
                 -- 31 days in December
                 if dayInMonth > 31 then
                     invalidDay dayInMonth
+
                 else
                     -- 30 days in November
                     -- ((30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31 + 28 + 31) * 24 * 60 * 60 * 1000)
