@@ -364,7 +364,7 @@ fromTime time =
         ++ toPaddedString 2 (Time.toSecond utc time)
         ++ "."
         -- SSS
-        ++ toPaddedString 2 (Time.toMillis utc time)
+        ++ toPaddedString 3 (Time.toMillis utc time)
         ++ "Z"
 
 
