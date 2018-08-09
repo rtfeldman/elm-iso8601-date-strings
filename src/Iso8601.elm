@@ -287,8 +287,12 @@ iso8601 =
         |. symbol ":"
         |= paddedInt 2
         -- ss
-        |. symbol "."
-        |= paddedInt 3
+        |= oneOf
+            [ succeed identity
+                |. symbol "."
+                |= paddedInt 3
+            , succeed 0
+            ]
         -- SSS
         |= oneOf
             [ -- "Z" means UTC
