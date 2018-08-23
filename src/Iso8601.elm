@@ -6,7 +6,7 @@ module Iso8601 exposing (fromTime, toTime)
 
 -}
 
-import Parser exposing ((|.), (|=), Parser, int, map, oneOf, succeed, symbol)
+import Parser exposing ((|.), (|=), Parser, andThen, int, map, oneOf, succeed, symbol)
 import Time exposing (Month(..), utc)
 
 
@@ -275,39 +275,45 @@ leapYearsBefore y1 =
 iso8601 : Parser Time.Posix
 iso8601 =
     -- TODO account for format variations, including those with UTC offsets
-    succeed fromParts
-        |= monthYearDayInMs
+    monthYearDayInMs
         -- YYYY-MM-DD
-        |. symbol "T"
-        |= paddedInt 2
-        -- HH
-        |. symbol ":"
-        |= paddedInt 2
-        -- mm
-        |. symbol ":"
-        |= paddedInt 2
-        -- ss
-        |= oneOf
-            [ succeed identity
-                |. symbol "."
-                |= paddedInt 3
-            , succeed 0
-            ]
-        -- SSS
-        |= oneOf
-            [ -- "Z" means UTC
-              map (\_ -> 0) (symbol "Z")
+        |> andThen
+            (\datePart ->
+                oneOf
+                    [ succeed (fromParts datePart)
+                        |. symbol "T"
+                        |= paddedInt 2
+                        -- HH
+                        |. symbol ":"
+                        |= paddedInt 2
+                        -- mm
+                        |. symbol ":"
+                        |= paddedInt 2
+                        -- ss
+                        |= oneOf
+                            [ succeed identity
+                                |. symbol "."
+                                |= paddedInt 3
+                            , succeed 0
+                            ]
+                        -- SSS
+                        |= oneOf
+                            [ -- "Z" means UTC
+                              map (\_ -> 0) (symbol "Z")
 
-            -- +05:00 means UTC+5 whereas -11:30 means UTC-11.5
-            , succeed utcOffsetMinutesFromParts
-                |= oneOf
-                    [ map (\_ -> 1) (symbol "+")
-                    , map (\_ -> -1) (symbol "-")
+                            -- +05:00 means UTC+5 whereas -11:30 means UTC-11.5
+                            , succeed utcOffsetMinutesFromParts
+                                |= oneOf
+                                    [ map (\_ -> 1) (symbol "+")
+                                    , map (\_ -> -1) (symbol "-")
+                                    ]
+                                |= paddedInt 2
+                                |. symbol ":"
+                                |= paddedInt 2
+                            ]
+                    , succeed (fromParts datePart 0 0 0 0 0)
                     ]
-                |= paddedInt 2
-                |. symbol ":"
-                |= paddedInt 2
-            ]
+            )
 
 
 {-| Parse the year, month, and day, and convert to milliseconds since the epoch.
