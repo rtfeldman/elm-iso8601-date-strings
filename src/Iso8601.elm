@@ -6,7 +6,7 @@ module Iso8601 exposing (fromTime, toTime)
 
 -}
 
-import Parser exposing ((|.), (|=), Parser, andThen, int, map, oneOf, succeed, symbol)
+import Parser exposing ((|.), (|=), Parser, andThen, int, map, oneOf, succeed, symbol, end)
 import Time exposing (Month(..), utc)
 
 
@@ -312,6 +312,7 @@ iso8601 =
                                 |= paddedInt 2
                             ]
                     , succeed (fromParts datePart 0 0 0 0 0)
+                        |. end
                     ]
             )
 
