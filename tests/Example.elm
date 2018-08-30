@@ -22,6 +22,10 @@ knownValues =
             \_ ->
                 Iso8601.toTime "1970-01-01T00:00:00Z"
                     |> Expect.equal (Ok (Time.millisToPosix 0))
+        , test "toTime \"1970-01-01\" gives me 0" <|
+            \_ ->
+                Iso8601.toTime "1970-01-01"
+                    |> Expect.equal (Ok (Time.millisToPosix 0))
         ]
 
 
