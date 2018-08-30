@@ -6,7 +6,7 @@ module Iso8601 exposing (fromTime, toTime)
 
 -}
 
-import Parser exposing ((|.), (|=), Parser, andThen, int, map, oneOf, succeed, symbol, end)
+import Parser exposing ((|.), (|=), Parser, andThen, end, int, map, oneOf, succeed, symbol)
 import Time exposing (Month(..), utc)
 
 
@@ -49,14 +49,14 @@ paddedInt quantity =
             )
 
 
-{-| 365 * 24 * 60 * 60 * 1000
+{-| 365 \* 24 \* 60 \* 60 \* 1000
 -}
 msPerYear : Int
 msPerYear =
     31536000000
 
 
-{-| 24 * 60 * 60 * 1000
+{-| 24 \* 60 \* 60 \* 1000
 -}
 msPerDay : Int
 msPerDay =
