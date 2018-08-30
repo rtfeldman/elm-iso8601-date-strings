@@ -49,17 +49,15 @@ paddedInt quantity =
             )
 
 
-{-| 365 \* 24 \* 60 \* 60 \* 1000
--}
 msPerYear : Int
 msPerYear =
+    --365 * 24 * 60 * 60 * 1000
     31536000000
 
 
-{-| 24 \* 60 \* 60 \* 1000
--}
 msPerDay : Int
 msPerDay =
+    -- 24 * 60 * 60 * 1000
     86400000
 
 
