@@ -6,7 +6,6 @@ module Iso8601 exposing (fromTime, toTime, decoder, encoder)
 
 -}
 
-
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Parser exposing ((|.), (|=), Parser, andThen, end, int, map, oneOf, succeed, symbol)
