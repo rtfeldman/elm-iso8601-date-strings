@@ -6,6 +6,7 @@ module Iso8601 exposing (fromTime, toTime, decoder, encoder)
 
 -}
 
+
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Parser exposing ((|.), (|=), Parser, andThen, end, int, map, oneOf, succeed, symbol)
@@ -74,17 +75,15 @@ paddedInt quantity =
             )
 
 
-{-| 365 * 24 * 60 * 60 * 1000
--}
 msPerYear : Int
 msPerYear =
+    --365 * 24 * 60 * 60 * 1000
     31536000000
 
 
-{-| 24 * 60 * 60 * 1000
--}
 msPerDay : Int
 msPerDay =
+    -- 24 * 60 * 60 * 1000
     86400000
 
 
