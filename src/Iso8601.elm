@@ -1,13 +1,30 @@
-module Iso8601 exposing (fromTime, toTime)
+module Iso8601 exposing (fromTime, toTime, decoder)
 
 {-| Convert between ISO-8601 date strings and POSIX times.
 
-@docs fromTime, toTime
+@docs fromTime, toTime, decoder
 
 -}
 
-import Parser exposing ((|.), (|=), Parser, andThen, int, map, oneOf, succeed, symbol, end)
+import Json.Decode as Decode exposing (Decoder)
+import Parser exposing ((|.), (|=), Parser, andThen, end, int, map, oneOf, succeed, symbol)
 import Time exposing (Month(..), utc)
+
+
+{-| Decode an ISO-8601 date string to a `Time.Posix` value.
+-}
+decoder : Decoder Time.Posix
+decoder =
+    Decode.string
+        |> Decode.andThen
+            (\str ->
+                case toTime str of
+                    Err deadEnds ->
+                        Decode.fail <| Parser.deadEndsToString deadEnds
+
+                    Ok time ->
+                        Decode.succeed time
+            )
 
 
 {-| Convert from an ISO-8601 date string to a `Time.Posix` value.
