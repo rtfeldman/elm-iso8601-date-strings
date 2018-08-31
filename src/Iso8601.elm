@@ -1,8 +1,8 @@
-module Iso8601 exposing (fromTime, toTime, decoder, encoder)
+module Iso8601 exposing (fromTime, toTime, decoder, encode)
 
 {-| Convert between ISO-8601 date strings and POSIX times.
 
-@docs fromTime, toTime, decoder, encoder
+@docs fromTime, toTime, decoder, encode
 
 -}
 
@@ -30,8 +30,8 @@ decoder =
 
 {-| Encode a `Time.Posix` value as an ISO-8601 date string.
 -}
-encoder : Time.Posix -> Encode.Value
-encoder =
+encode : Time.Posix -> Encode.Value
+encode =
     fromTime >> Encode.string
 
 
