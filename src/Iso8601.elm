@@ -12,7 +12,7 @@ import Parser exposing ((|.), (|=), Parser, andThen, end, int, map, oneOf, succe
 import Time exposing (Month(..), utc)
 
 
-{-| Decode an ISO-8601 date string to a `Time.Posix` value.
+{-| Decode an ISO-8601 date string to a `Time.Posix` value using [`toTime`](#toTime).
 -}
 decoder : Decoder Time.Posix
 decoder =
@@ -28,7 +28,8 @@ decoder =
             )
 
 
-{-| Encode a `Time.Posix` value as an ISO-8601 date string.
+{-| Encode a `Time.Posix` value as an ISO-8601 date string using
+[`fromTime`](#fromTime).
 -}
 encode : Time.Posix -> Encode.Value
 encode =
