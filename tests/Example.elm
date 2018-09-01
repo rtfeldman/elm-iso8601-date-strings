@@ -54,6 +54,10 @@ knownValues =
             \_ ->
                 Iso8601.toTime "2018-08-31T23:25:16.019345123+02:00"
                     |> Expect.equal (Ok (Time.millisToPosix 1535750716019))
+        , test "toTime doesn't support fractions more than 9 digits" <|
+            \_ ->
+                Iso8601.toTime "2018-08-31T23:25:16.0123456789+02:00"
+                    |> Expect.err
         ]
 
 
