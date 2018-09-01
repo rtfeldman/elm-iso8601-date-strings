@@ -54,28 +54,24 @@ paddedInt : Int -> Parser Int
 paddedInt quantity =
     Parser.chompWhile Char.isDigit
         |> Parser.getChompedString
-        |> Parser.andThen (paddedStringToInt quantity)
+        |> Parser.andThen
+            (\str ->
+                if String.length str == quantity then
+                    -- StringtoInt works on zero-padded integers
+                    case String.toInt str of
+                        Just intVal ->
+                            Parser.succeed intVal
 
+                        Nothing ->
+                            Parser.problem ("Invalid integer: \"" ++ str ++ "\"")
 
-{-| Extract a fixed-length integer from the string.
--}
-paddedStringToInt : Int -> String -> Parser Int
-paddedStringToInt quantity str =
-    if String.length str == quantity then
-        -- StringtoInt works on zero-padded integers
-        case String.toInt str of
-            Just intVal ->
-                Parser.succeed intVal
-
-            Nothing ->
-                Parser.problem ("Invalid integer: \"" ++ str ++ "\"")
-
-    else
-        Parser.problem
-            ("Expected "
-                ++ String.fromInt quantity
-                ++ " digits, but got "
-                ++ String.fromInt (String.length str)
+                else
+                    Parser.problem
+                        ("Expected "
+                            ++ String.fromInt quantity
+                            ++ " digits, but got "
+                            ++ String.fromInt (String.length str)
+                        )
             )
 
 
@@ -321,7 +317,7 @@ iso8601 =
                         |= oneOf
                             [ succeed identity
                                 |. symbol "."
-                                |= milliMicroNanoInMs
+                                |= fractionsOfASecondInMs
                             , succeed 0
                             ]
                         -- SSS
@@ -345,22 +341,27 @@ iso8601 =
             )
 
 
-{-| Parse milli-, micro-, or nanoseconds and convert to milliseconds
+{-| Parse fractions of a second, and convert to milliseconds
 -}
-milliMicroNanoInMs : Parser Int
-milliMicroNanoInMs =
+fractionsOfASecondInMs : Parser Int
+fractionsOfASecondInMs =
     Parser.chompWhile Char.isDigit
         |> Parser.getChompedString
         |> Parser.andThen
             (\str ->
-                List.range 1 3
-                    |> List.map
-                        (\precision ->
-                            map
-                                (\s -> s // (1000 ^ (precision - 1)))
-                                (paddedStringToInt (3 * precision) str)
+                if String.length str <= 9 then
+                    case String.toFloat ("0." ++ str) of
+                        Just floatVal ->
+                            Parser.succeed (round (floatVal * 1000))
+
+                        Nothing ->
+                            Parser.problem ("Invalid float: \"" ++ str ++ "\"")
+
+                else
+                    Parser.problem
+                        ("Expected at most 9 digits, but got "
+                            ++ String.fromInt (String.length str)
                         )
-                    |> oneOf
             )
 
 
