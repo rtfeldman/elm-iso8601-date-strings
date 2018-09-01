@@ -46,6 +46,14 @@ knownValues =
             \_ ->
                 Iso8601.toTime "1970-01-01"
                     |> Expect.equal (Ok (Time.millisToPosix 0))
+        , test "toTime supports microseconds precision" <|
+            \_ ->
+                Iso8601.toTime "2018-08-31T23:25:16.019345+02:00"
+                    |> Expect.equal (Ok (Time.millisToPosix 1535750716019))
+        , test "toTime supports nanoseconds precision" <|
+            \_ ->
+                Iso8601.toTime "2018-08-31T23:25:16.019345123+02:00"
+                    |> Expect.equal (Ok (Time.millisToPosix 1535750716019))
         ]
 
 
