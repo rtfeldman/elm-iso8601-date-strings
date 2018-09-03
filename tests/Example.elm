@@ -30,6 +30,10 @@ knownValues =
             \_ ->
                 Iso8601.toTime "2012-11-12T00:00:00+01:00"
                     |> Expect.equal (Ok (Time.millisToPosix 1352674800000))
+        , test "toTime \"2012-11-12T00:00:00+0100\" gives me 1352674800000" <|
+            \_ ->
+                Iso8601.toTime "2012-11-12T00:00:00+0100"
+                    |> Expect.equal (Ok (Time.millisToPosix 1352674800000))
         , test "-5:00 is an invalid UTC offset (should be -05:00)" <|
             \_ ->
                 Iso8601.toTime "2012-04-01T00:00:00-5:00"
