@@ -52,27 +52,24 @@ toTime str =
 -}
 paddedInt : Int -> Parser Int
 paddedInt quantity =
-    Parser.chompWhile Char.isDigit
-        |> Parser.getChompedString
-        |> Parser.andThen
-            (\str ->
-                if String.length str == quantity then
-                    -- StringtoInt works on zero-padded integers
-                    case String.toInt str of
-                        Just intVal ->
-                            Parser.succeed intVal
+    let
+        helper str =
+            if String.length str == quantity then
+                -- StringtoInt works on zero-padded integers
+                case String.toInt str of
+                    Just intVal ->
+                        Parser.succeed intVal
+                            |> Parser.map Parser.Done
 
-                        Nothing ->
-                            Parser.problem ("Invalid integer: \"" ++ str ++ "\"")
+                    Nothing ->
+                        Parser.problem ("Invalid integer: \"" ++ str ++ "\"")
 
-                else
-                    Parser.problem
-                        ("Expected "
-                            ++ String.fromInt quantity
-                            ++ " digits, but got "
-                            ++ String.fromInt (String.length str)
-                        )
-            )
+            else
+                Parser.chompIf Char.isDigit
+                    |> Parser.getChompedString
+                    |> Parser.map (\nextChar -> Parser.Loop <| String.append str nextChar)
+    in
+    Parser.loop "" helper
 
 
 msPerYear : Int
@@ -308,11 +305,19 @@ iso8601 =
                         |. symbol "T"
                         |= paddedInt 2
                         -- HH
-                        |. symbol ":"
-                        |= paddedInt 2
+                        |= oneOf
+                            [ succeed identity
+                                |. symbol ":"
+                                |= paddedInt 2
+                            , paddedInt 2
+                            ]
                         -- mm
-                        |. symbol ":"
-                        |= paddedInt 2
+                        |= oneOf
+                            [ succeed identity
+                                |. symbol ":"
+                                |= paddedInt 2
+                            , paddedInt 2
+                            ]
                         -- ss
                         |= oneOf
                             [ succeed identity
@@ -377,11 +382,19 @@ monthYearDayInMs =
     Parser.succeed (\year month day -> ( year, month, day ))
         |= paddedInt 4
         -- YYYY
-        |. symbol "-"
-        |= paddedInt 2
+        |= oneOf
+            [ succeed identity
+                |. symbol "-"
+                |= paddedInt 2
+            , paddedInt 2
+            ]
         -- MM
-        |. symbol "-"
-        |= paddedInt 2
+        |= oneOf
+            [ succeed identity
+                |. symbol "-"
+                |= paddedInt 2
+            , paddedInt 2
+            ]
         -- DD
         |> Parser.andThen yearMonthDay
 

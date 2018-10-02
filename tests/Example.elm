@@ -58,6 +58,14 @@ knownValues =
             \_ ->
                 Iso8601.toTime "2018-08-31T23:25:16.0123456789+02:00"
                     |> Expect.err
+        , test "toTime supports no delimeters" <|
+            \_ ->
+                Iso8601.toTime "20180831T232516Z"
+                    |> Expect.equal (Ok (Time.millisToPosix 1535757916000))
+        , test "toTime supports nanoseconds precision when there are no delimeters" <|
+            \_ ->
+                Iso8601.toTime "20180831T232516.019345123+02:00"
+                    |> Expect.equal (Ok (Time.millisToPosix 1535750716019))
         ]
 
 
