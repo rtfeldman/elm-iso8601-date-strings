@@ -70,6 +70,18 @@ knownValues =
             \_ ->
                 Iso8601.toTime "2080831T232516Z"
                     |> Expect.err
+        , test "toTime supports no delimiter in offset" <|
+            \_ ->
+                Iso8601.toTime "2012-11-12T00:00:00+0130"
+                    |> Expect.equal (Ok (Time.millisToPosix 1352673000000))
+        , test "toTime supports offset with only hours" <|
+            \_ ->
+                Iso8601.toTime "2012-11-12T00:00:00+01"
+                    |> Expect.equal (Ok (Time.millisToPosix 1352674800000))
+        , test "toTime fails on invalid offset" <|
+            \_ ->
+                Iso8601.toTime "2012-11-12T00:00:00+0130546"
+                    |> Expect.err
         ]
 
 
