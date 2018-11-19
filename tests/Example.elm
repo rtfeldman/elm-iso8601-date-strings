@@ -78,6 +78,10 @@ knownValues =
             \_ ->
                 Iso8601.toTime "2012-11-12T00:00:00+01"
                     |> Expect.equal (Ok (Time.millisToPosix 1352674800000))
+        , test "toTime fails on invalid offset" <|
+            \_ ->
+                Iso8601.toTime "2012-11-12T00:00:00+0130546"
+                    |> Expect.err
         ]
 
 

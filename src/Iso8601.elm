@@ -327,6 +327,7 @@ iso8601 =
                             ]
                         -- SSS
                         |= utcOffsetInMinutes
+                        |. end
                     , succeed (fromParts datePart 0 0 0 0 0)
                         |. end
                     ]
@@ -336,14 +337,10 @@ iso8601 =
 utcOffsetInMinutes : Parser Int
 utcOffsetInMinutes =
     let
-        offsetInMinutes : Int -> Int -> Int
-        offsetInMinutes hours minutes =
-            (hours * 60) + minutes
-
-        utcOffsetMinutesFromParts : Int -> Int -> Int
-        utcOffsetMinutesFromParts multiplier calculatedOffset =
+        utcOffsetMinutesFromParts : Int -> Int -> Int -> Int
+        utcOffsetMinutesFromParts multiplier hours minutes =
             -- multiplier is either 1 or -1 (for negative UTC offsets)
-            multiplier * calculatedOffset
+            multiplier * (hours * 60) + minutes
     in
     Parser.succeed identity
         |= oneOf
@@ -357,17 +354,13 @@ utcOffsetInMinutes =
                     , map (\_ -> -1) (symbol "-")
                     ]
                 -- support 01, 0100 and 01:00
+                |= paddedInt 2
                 |= oneOf
-                    [ succeed offsetInMinutes
-                        |= paddedInt 2
-                        |= succeed 0
-                    , succeed offsetInMinutes
-                        |= paddedInt 2
-                        |= paddedInt 2
-                    , succeed offsetInMinutes
-                        |= paddedInt 2
+                    [ succeed identity
                         |. symbol ":"
                         |= paddedInt 2
+                    , paddedInt 2
+                    , succeed 0
                     ]
             ]
 
