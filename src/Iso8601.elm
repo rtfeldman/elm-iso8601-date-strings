@@ -334,6 +334,10 @@ iso8601 =
                                 |= paddedInt 2
                                 |. symbol ":"
                                 |= paddedInt 2
+
+                            -- No "Z" is valid
+                            , succeed 0
+                                |. end
                             ]
                     , succeed (fromParts datePart 0 0 0 0 0)
                         |. end
