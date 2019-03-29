@@ -362,7 +362,11 @@ utcOffsetInMinutes =
                     , paddedInt 2
                     , succeed 0
                     ]
-            ]
+
+            -- No "Z" is valid
+            , succeed 0
+                |. end
+            ]            
 
 
 {-| Parse fractions of a second, and convert to milliseconds
