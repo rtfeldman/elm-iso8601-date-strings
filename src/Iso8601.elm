@@ -317,6 +317,7 @@ iso8601 =
                                 |. symbol ":"
                                 |= paddedInt 2
                             , paddedInt 2
+                            , succeed 0
                             ]
                         -- ss
                         |= oneOf
@@ -366,7 +367,7 @@ utcOffsetInMinutes =
             -- No "Z" is valid
             , succeed 0
                 |. end
-            ]            
+            ]
 
 
 {-| Parse fractions of a second, and convert to milliseconds
