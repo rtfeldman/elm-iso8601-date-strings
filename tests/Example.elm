@@ -1,7 +1,7 @@
 module Example exposing (knownValues, reflexive)
 
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, float, int, list, string)
+import Expect
+import Fuzz
 import Iso8601
 import Test exposing (..)
 import Time
@@ -94,12 +94,16 @@ knownValues =
             \_ ->
                 Iso8601.toTime "2012-11-12T00:00:00+0130546"
                     |> Expect.err
+        , test "toTime accepts dates without a day specified" <|
+            \_ ->
+                Iso8601.toTime "2012-11T00:00:00+0130546"
+                    |> Expect.equal (Ok (Time.millisToPosix 1352674800000))
         ]
 
 
 reflexive : Test
 reflexive =
-    fuzz int "(fromTime >> toTime) is a no-op" <|
+    fuzz Fuzz.int "(fromTime >> toTime) is a no-op" <|
         \num ->
             let
                 time =

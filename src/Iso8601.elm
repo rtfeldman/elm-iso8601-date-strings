@@ -8,7 +8,7 @@ module Iso8601 exposing (fromTime, toTime, decoder, encode)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
-import Parser exposing ((|.), (|=), Parser, andThen, end, int, map, oneOf, succeed, symbol)
+import Parser exposing ((|.), (|=), Parser, andThen, end, map, oneOf, succeed, symbol)
 import Time exposing (Month(..), utc)
 
 
@@ -366,7 +366,7 @@ utcOffsetInMinutes =
             -- No "Z" is valid
             , succeed 0
                 |. end
-            ]            
+            ]
 
 
 {-| Parse fractions of a second, and convert to milliseconds
@@ -403,14 +403,8 @@ succeed or problem when we encounter February 29.
 monthYearDayInMs : Parser Int
 monthYearDayInMs =
     Parser.succeed (\year month day -> ( year, month, day ))
-        |= paddedInt 4
         -- YYYY
-        |= oneOf
-            [ succeed identity
-                |. symbol "-"
-                |= paddedInt 2
-            , paddedInt 2
-            ]
+        |= paddedInt 4
         -- MM
         |= oneOf
             [ succeed identity
@@ -419,6 +413,12 @@ monthYearDayInMs =
             , paddedInt 2
             ]
         -- DD
+        |= oneOf
+            [ succeed identity
+                |. symbol "-"
+                |= paddedInt 2
+            , paddedInt 2
+            ]
         |> Parser.andThen yearMonthDay
 
 
