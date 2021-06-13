@@ -6,9 +6,10 @@ module Iso8601 exposing (fromTime, toTime, decoder, encode)
 
 -}
 
+import DeadEnds exposing (deadEndsToString)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
-import Parser exposing ((|.), (|=), Parser, andThen, end, int, map, oneOf, succeed, symbol)
+import Parser exposing ((|.), (|=), Parser, andThen, end, map, oneOf, succeed, symbol)
 import Time exposing (Month(..), utc)
 
 
@@ -21,7 +22,7 @@ decoder =
             (\str ->
                 case toTime str of
                     Err deadEnds ->
-                        Decode.fail <| Parser.deadEndsToString deadEnds
+                        Decode.fail <| deadEndsToString deadEnds
 
                     Ok time ->
                         Decode.succeed time

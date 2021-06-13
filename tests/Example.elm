@@ -1,10 +1,11 @@
 module Example exposing (knownValues, reflexive)
 
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, float, int, list, string)
+import Expect
+import Fuzz
 import Iso8601
 import Test exposing (..)
 import Time
+import Json.Decode exposing (decodeString, errorToString)
 
 
 knownValues : Test
@@ -98,12 +99,19 @@ knownValues =
             \_ ->
                 Iso8601.toTime "2019-05-30T06:30"
                     |> Expect.equal (Ok (Time.millisToPosix 1559197800000))
+        , test "decoder returns clearer error for dead ends" <|
+            \_ ->
+                case decodeString Iso8601.decoder "2010-09-31T14:29:25.01235Z" of
+                    Err error ->
+                        Expect.notEqual (errorToString error) "TODO deadEndsToString"
+                    Ok _ ->
+                        Expect.fail "Should fail on dead ends"
         ]
 
 
 reflexive : Test
 reflexive =
-    fuzz int "(fromTime >> toTime) is a no-op" <|
+    fuzz Fuzz.int "(fromTime >> toTime) is a no-op" <|
         \num ->
             let
                 time =
