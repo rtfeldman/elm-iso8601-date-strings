@@ -95,6 +95,10 @@ knownValues =
             \_ ->
                 Iso8601.toTime "2012-11-12T00:00:00+0130546"
                     |> Expect.err
+        , test "toTime supports yyyy-mm-ddThh:mm format" <|
+            \_ ->
+                Iso8601.toTime "2019-05-30T06:30"
+                    |> Expect.equal (Ok (Time.millisToPosix 1559197800000))
         , test "decoder returns clearer error for dead ends" <|
             \_ ->
                 case decodeString Iso8601.decoder "2010-09-31T14:29:25.01235Z" of

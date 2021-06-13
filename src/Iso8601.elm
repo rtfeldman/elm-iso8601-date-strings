@@ -318,6 +318,7 @@ iso8601 =
                                 |. symbol ":"
                                 |= paddedInt 2
                             , paddedInt 2
+                            , succeed 0
                             ]
                         -- ss
                         |= oneOf
