@@ -100,7 +100,7 @@ epochYear =
 
 yearMonthDay : ( Int, Int, Int ) -> Parser Int
 yearMonthDay ( year, month, dayInMonth ) =
-    if dayInMonth < 0 then
+    if dayInMonth < 1 then
         invalidDay dayInMonth
 
     else

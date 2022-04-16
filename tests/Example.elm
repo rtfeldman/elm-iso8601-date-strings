@@ -59,6 +59,10 @@ knownValues =
             \_ ->
                 Iso8601.toTime "1970-01-01"
                     |> Expect.equal (Ok (Time.millisToPosix 0))
+        , test "Invalid day gives error" <|
+            \_ ->
+                Iso8601.toTime "2000-01-00"
+                    |> Expect.err
         , test "toTime supports microseconds precision" <|
             \_ ->
                 Iso8601.toTime "2018-08-31T23:25:16.019345+02:00"
