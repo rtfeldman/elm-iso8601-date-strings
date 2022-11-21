@@ -342,7 +342,7 @@ utcOffsetInMinutes =
         utcOffsetMinutesFromParts : Int -> Int -> Int -> Int
         utcOffsetMinutesFromParts multiplier hours minutes =
             -- multiplier is either 1 or -1 (for negative UTC offsets)
-            multiplier * (hours * 60) + minutes
+            multiplier * ((hours * 60) + minutes)
     in
     Parser.succeed identity
         |= oneOf
