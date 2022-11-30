@@ -3,9 +3,9 @@ module Example exposing (knownValues, reflexive)
 import Expect
 import Fuzz
 import Iso8601
+import Json.Decode exposing (decodeString, errorToString)
 import Test exposing (..)
 import Time
-import Json.Decode exposing (decodeString, errorToString)
 
 
 knownValues : Test
@@ -99,11 +99,20 @@ knownValues =
             \_ ->
                 Iso8601.toTime "2019-05-30T06:30"
                     |> Expect.equal (Ok (Time.millisToPosix 1559197800000))
+        , test "toTime supports yyyy-mm format with time attached" <|
+            \_ ->
+                Iso8601.toTime "2022-01T00:00"
+                    |> Expect.equal (Ok (Time.millisToPosix 1640995200000))
+        , test "toTime supports yyyy-mm format without time attached" <|
+            \_ ->
+                Iso8601.toTime "2022-11"
+                    |> Expect.equal (Ok (Time.millisToPosix 1667260800000))
         , test "decoder returns clearer error for dead ends" <|
             \_ ->
                 case decodeString Iso8601.decoder "2010-09-31T14:29:25.01235Z" of
                     Err error ->
                         Expect.notEqual (errorToString error) "TODO deadEndsToString"
+
                     Ok _ ->
                         Expect.fail "Should fail on dead ends"
         ]
