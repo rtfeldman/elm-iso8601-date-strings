@@ -419,6 +419,7 @@ monthYearDayInMs =
                 |. symbol "-"
                 |= paddedInt 2
             , paddedInt 2
+            , succeed 1
             ]
         -- DD
         |> Parser.andThen yearMonthDay
